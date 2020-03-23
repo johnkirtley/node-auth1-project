@@ -4,6 +4,7 @@ const session = require('express-session');
 
 const userRouter = require('../users/user_router');
 const authRouter = require('../auth/auth_router');
+const restricted = require('../auth/restricted');
 
 const server = express();
 
@@ -23,7 +24,7 @@ server.use(express.json());
 server.use(cors());
 server.use(session(sessionConfig));
 
-server.use('/api/users', userRouter);
+server.use('/api/users', restricted, userRouter);
 server.use('/api/auth', authRouter);
 
 server.get('/', (req, res) => {
