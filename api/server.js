@@ -24,11 +24,25 @@ server.use(express.json());
 server.use(cors());
 server.use(session(sessionConfig));
 
-server.use('/api/users', restricted, userRouter);
-server.use('/api/auth', authRouter);
+server.use('/api/users', restricted, checkRole('user'), userRouter);
+server.use('/api/auth', restricted, authRouter);
 
 server.get('/', (req, res) => {
 	res.json({ api: 'server running' });
 });
 
 module.exports = server;
+
+function checkRole(role) {
+	return (req, res, next) => {
+		if (
+			req.decodedToken &&
+			req.decodedToken.role === role &&
+			req.decodedToken.role.toLowerCase() === role
+		) {
+			next();
+		} else {
+			res.status(403).json({ message: 'unauthorized user' });
+		}
+	};
+}
